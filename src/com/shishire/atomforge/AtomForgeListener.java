@@ -21,6 +21,12 @@ import org.bukkit.material.MaterialData;
 
 public class AtomForgeListener implements Listener {
 
+	/**
+	 * Catches events for the creation of a new sign.  Technically, catches sign change events,
+	 * since sign place events would be useless for this purpose.  If the sign's first line is
+	 * not "[AtomForge]", dumps out.  Cancels the change on a sign with bad syntax.
+	 * @param event
+	 */
 	@EventHandler
 	public void onSignChange(SignChangeEvent event)
 	{
@@ -53,9 +59,13 @@ public class AtomForgeListener implements Listener {
 		}
 	}
 	
+	/**
+	 * Catches events for player interaction with blocks.  Throws away anything that doesn't involve right-clicking on a sign who's first line is "[AtomForge]".
+	 * @param event
+	 */
 	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event) throws UnparseableMaterialException
+	public void onPlayerInteract(PlayerInteractEvent event)
 	{
 		if(!event.hasBlock())
 			return;
@@ -92,6 +102,12 @@ public class AtomForgeListener implements Listener {
 		
 	}
 
+	/**
+	 * Parses Item Id strings, and attempts to convert it into a format that can be handled programmatically.
+	 * @param inputItemString A string that is potentially in the format of "32 Wool:5", "13 35:2", "64 13", or "1 Dirt" 
+	 * @return An ItemStack of a material/data-value/quantity.
+	 * @throws UnparseableMaterialException
+	 */
 	private ItemStack parseItem(String inputItemString) throws UnparseableMaterialException {
 		Pattern quantItem = Pattern.compile("^(\\d+?)\\s+?(\\w+\\s*\\w*):?(\\d*?)$");
 		Matcher matcher = quantItem.matcher(inputItemString);
@@ -119,6 +135,10 @@ public class AtomForgeListener implements Listener {
 	}
 	
 	/**
+	 * Removes the specified number of items from a players inventory, automatically handling multiple stacks, and partial stacks.
+	 * Origin credit goes to Pasukaru, at <http://forums.bukkit.org/threads/removing-set-amount-of-an-item-from-players-inventory.40182/#post-727975>
+	 * Modified by Shishire.
+	 * 
 	 * @author Pasukaru
 	 * @author Shishire
 	 * @param inventory A Player Inventory
@@ -126,10 +146,6 @@ public class AtomForgeListener implements Listener {
 	 * @param meta Data Value, allowing you to remove only a specific type of a material
 	 * @param quantity Total amount of items removed
 	 * @return Total Amount of Material which could not be removed (probably due to the specified inventory not containing enough of the material)
-	 * 
-	 * Removes the specified number of items from a players inventory, automatically handling multiple stacks, and partial stacks.
-	 * Origin credit goes to Pasukaru, at <http://forums.bukkit.org/threads/removing-set-amount-of-an-item-from-players-inventory.40182/#post-727975>
-	 * Modified by Shishire.
 	 */
 	public static int removeItem(Inventory inventory, ItemStack remove) {
 		int rest = remove.getAmount();
@@ -140,7 +156,6 @@ public class AtomForgeListener implements Listener {
             if( stack == null || stack.getTypeId() != remove.getTypeId() )
                 continue;
         	
-            // TODO: This needs to be cleaned, it makes several unsafe assumptions
             if( stack.getType().getMaxDurability() < 0 && !stack.getData().equals(remove.getData()) ){
                 continue;
             }
@@ -157,6 +172,19 @@ public class AtomForgeListener implements Listener {
         return quantity-rest;
     }
 	
+	/**
+	 * @author Pasukaru
+	 * @author Shishire
+	 * @param inventory A Player Inventory
+	 * @param id The id of the item to remove
+	 * @param meta Data Value, allowing you to remove only a specific type of a material
+	 * @param quantity Total amount of items removed
+	 * @return Total Amount of Material which could not be removed (probably due to the specified inventory not containing enough of the material)
+	 * 
+	 * Removes the specified number of items from a players inventory, automatically handling multiple stacks, and partial stacks.
+	 * Origin credit goes to Pasukaru, at <http://forums.bukkit.org/threads/removing-set-amount-of-an-item-from-players-inventory.40182/#post-727975>
+	 * Modified by Shishire.
+	 */
 	public static boolean containsItem(Inventory inventory, ItemStack check) {
 		int rest = check.getAmount();
 		
@@ -164,7 +192,7 @@ public class AtomForgeListener implements Listener {
             ItemStack stack = inventory.getItem(i); 
             if( stack == null || stack.getTypeId() != check.getTypeId() )
                 continue;
-            // TODO: This needs to be cleaned, it makes several unsafe assumptions
+            
             if( stack.getType().getMaxDurability() <= 0 && stack.getData().getData() != check.getData().getData() ){
                 continue;
             }
