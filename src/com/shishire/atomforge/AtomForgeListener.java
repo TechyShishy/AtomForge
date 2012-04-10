@@ -1,6 +1,6 @@
 package com.shishire.atomforge;
 
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,8 +24,9 @@ public class AtomForgeListener implements Listener {
 	@EventHandler
 	public void onSignChange(SignChangeEvent event)
 	{
-		@SuppressWarnings("unused")
-		Logger log = Logger.getLogger("AtomForge");
+		//@SuppressWarnings("unused")
+		//Logger log = Logger.getLogger("AtomForge");
+		
 		// First line should look like this "[AtomForge]
 		if(event.getLine(0).equals("[AtomForge]"))
 		{
@@ -54,7 +55,7 @@ public class AtomForgeListener implements Listener {
 	
 	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event)
+	public void onPlayerInteract(PlayerInteractEvent event) throws UnparseableMaterialException
 	{
 		if(!event.hasBlock())
 			return;
@@ -68,8 +69,18 @@ public class AtomForgeListener implements Listener {
 		if(event.getAction() == Action.LEFT_CLICK_BLOCK)
 			return;
 		event.setCancelled(true);
-		ItemStack input = parseItem(sign.getLine(1));
-		ItemStack output = parseItem(sign.getLine(2));
+		ItemStack input = null;
+		ItemStack output = null;
+		try
+		{
+			input = parseItem(sign.getLine(1));
+			output = parseItem(sign.getLine(2));
+		}
+		catch (UnparseableMaterialException e)
+		{
+			event.getPlayer().sendMessage(ChatColor.RED + "Broken AtomForge Sign.");
+			return;
+		}
 		Player player = event.getPlayer();
 		PlayerInventory inv = player.getInventory();
 		if(!containsItem(inv, input))
@@ -81,7 +92,7 @@ public class AtomForgeListener implements Listener {
 		
 	}
 
-	private ItemStack parseItem(String inputItemString) {
+	private ItemStack parseItem(String inputItemString) throws UnparseableMaterialException {
 		Pattern quantItem = Pattern.compile("^(\\d+?)\\s+?(\\w+\\s*\\w*):?(\\d*?)$");
 		Matcher matcher = quantItem.matcher(inputItemString);
 		if(matcher.find())
@@ -150,7 +161,6 @@ public class AtomForgeListener implements Listener {
 		int rest = check.getAmount();
 		
         for( int i = 0 ; i < inventory.getSize() ; i++ ){
-            Logger.getLogger("AtomForge").info(String.valueOf(rest));
             ItemStack stack = inventory.getItem(i); 
             if( stack == null || stack.getTypeId() != check.getTypeId() )
                 continue;
@@ -160,7 +170,6 @@ public class AtomForgeListener implements Listener {
             }
             if( rest >= stack.getAmount() ){
                 rest -= stack.getAmount();
-                Logger.getLogger("AtomForge").info(String.valueOf(rest));
             } else if( rest>0 ){
                     rest = 0;
                     break;
@@ -168,7 +177,6 @@ public class AtomForgeListener implements Listener {
                 break;
             }
         }
-        Logger.getLogger("AtomForge").info(String.valueOf(check.getAmount()));
         return rest == 0;
     }
 }

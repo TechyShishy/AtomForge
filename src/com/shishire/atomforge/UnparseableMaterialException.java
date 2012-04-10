@@ -1,6 +1,6 @@
 package com.shishire.atomforge;
-// TODO: This really needs to be a regular exception, not a runtime.
-public class UnparseableMaterialException extends RuntimeException {
+
+public class UnparseableMaterialException extends Exception {
 
 	/**
 	 * 
