@@ -150,21 +150,25 @@ public class AtomForgeListener implements Listener {
 		int rest = check.getAmount();
 		
         for( int i = 0 ; i < inventory.getSize() ; i++ ){
+            Logger.getLogger("AtomForge").info(String.valueOf(rest));
             ItemStack stack = inventory.getItem(i); 
             if( stack == null || stack.getTypeId() != check.getTypeId() )
                 continue;
             // TODO: This needs to be cleaned, it makes several unsafe assumptions
-            if( stack.getType().getMaxDurability() < 0 && !stack.getData().equals(check.getData()) ){
+            if( stack.getType().getMaxDurability() <= 0 && stack.getData().getData() != check.getData().getData() ){
                 continue;
             }
             if( rest >= stack.getAmount() ){
                 rest -= stack.getAmount();
+                Logger.getLogger("AtomForge").info(String.valueOf(rest));
             } else if( rest>0 ){
                     rest = 0;
+                    break;
             } else {
                 break;
             }
         }
+        Logger.getLogger("AtomForge").info(String.valueOf(check.getAmount()));
         return rest == 0;
     }
 }
