@@ -1,3 +1,10 @@
 name: AtomForge
 version: 0.1
 main: com.shishire.atomforge.AtomForge
+permissions:
+  atomforge.sign.create:
+    default: op
+  atomforge.sign.destroy:
+    default: op
+  atomforge.interact.trade:
+    default: true

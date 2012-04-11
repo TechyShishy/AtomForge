@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+//import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,6 +37,11 @@ public class AtomForgeListener implements Listener {
 		// First line should look like this "[AtomForge]
 		if(event.getLine(0).equals("[AtomForge]"))
 		{
+			if(!event.getPlayer().hasPermission("atomforge.sign.create"))
+			{
+				event.setCancelled(true);
+				return;
+			}
 			String inputItemString = event.getLine(1);
 			String outputItemString = event.getLine(2);
 			@SuppressWarnings("unused")
@@ -77,8 +83,25 @@ public class AtomForgeListener implements Listener {
 			return;
 		
 		if(event.getAction() == Action.LEFT_CLICK_BLOCK)
-			return;
+		{
+			if(event.getPlayer().hasPermission("atomforge.sign.destroy"))
+			{
+				return;
+			}
+			else
+			{
+				event.setCancelled(true);
+				return;
+			}
+		}
+		
+		// Right click, ignore block placement
 		event.setCancelled(true);
+		
+		if(!event.getPlayer().hasPermission("atomforge.interact.trade"))
+		{
+			return;
+		}
 		ItemStack input = null;
 		ItemStack output = null;
 		try
